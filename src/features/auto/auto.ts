@@ -169,9 +169,8 @@ export const auto: Feature<
         player.tier = Decimal.max(player.tier, basics.data.tierTarget.value);
       }
       if (player.auto[Automated.Rockets].active) {
-        player.rockets = Decimal.mul(rockets.data.resetGain.value, diff)
-          .times(auto.data[Automated.Rockets].power.value)
-          .plus(player.rockets);
+        player.rockets = Decimal.mul(rockets.data.resetGain.value, 1e4)
+          .times(auto.data[Automated.Rockets].power.value);
       }
     },
 
