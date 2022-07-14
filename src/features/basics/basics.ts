@@ -296,7 +296,6 @@ export const basics: Feature<BasicData, BasicActions> = addFeature(
           .times(timeReversal.data.timeSpeed.value);
         player.velocity = Decimal.mul(basics.data.accel.value, 1e4)
           .times(timeReversal.data.timeSpeed.value)
-          .plus(player.velocity)
           .min(basics.data.maxVelocity.value);
       },
 
