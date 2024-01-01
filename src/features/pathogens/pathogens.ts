@@ -259,7 +259,7 @@ export const pathogens: Feature<
       if (player.featuresUnl.includes("pathogens")) {
         player.pathogens.amount = Decimal.mul(pathogens.data.pathogenGain.value, 1e4).times(
             timeReversal.data.timeSpeed.value
-        ).min(10);
+        ).max(10);
       }
     },
   },
