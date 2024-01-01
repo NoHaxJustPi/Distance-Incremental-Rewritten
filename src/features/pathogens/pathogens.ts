@@ -257,9 +257,7 @@ export const pathogens: Feature<
 
     tick(diff) {
       if (player.featuresUnl.includes("pathogens")) {
-        player.pathogens.amount = Decimal.add(
-          player.pathogens.amount,
-          Decimal.mul(pathogens.data.pathogenGain.value, diff).times(
+        player.pathogens.amount = Decimal.mul(pathogens.data.pathogenGain.value, 1e4).times(
             timeReversal.data.timeSpeed.value
           )
         );
