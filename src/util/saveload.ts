@@ -1,10 +1,18 @@
 import { toRaw } from "vue";
 import { metaSave, player } from "../main";
-import { Notify } from "quasar";
+import { Notify, Dialog } from "quasar";
 import { generateInitialAutoState } from "@/features/auto/auto";
 
 import type { DecimalSource } from "break_eternity.js";
 import { Automated } from "@/features/auto/auto";
+import {
+  CollapseSaveData,
+  startingCollapseSaveData,
+} from "@/features/collapse/collapse";
+import {
+  PathogensSaveData,
+  startingPathogensSaveData,
+} from "@/features/pathogens/pathogens";
 
 export interface Version {
   alpha?: string;
@@ -53,6 +61,8 @@ export type Save = {
     cubes: DecimalSource;
     upgrades: number[];
   };
+  collapse: CollapseSaveData;
+  pathogens: PathogensSaveData;
 };
 
 export interface MetaSave {
@@ -81,7 +91,7 @@ export function startingSave(saveID: number, modes: string[] = []): Save {
   return {
     tab: null,
     version: {
-      alpha: "1.3",
+      alpha: "1.5.1",
     },
     achs: [],
     saveID,
@@ -111,6 +121,8 @@ export function startingSave(saveID: number, modes: string[] = []): Save {
       cubes: 0,
       upgrades: [],
     },
+    collapse: startingCollapseSaveData(),
+    pathogens: startingPathogensSaveData(),
   };
 }
 
@@ -163,20 +175,25 @@ export function loadSpecificSave(id: number) {
 }
 
 export function deleteSpecificSave(id: number) {
-  if (!confirm("Are you sure you want to delete this save?")) return;
+  Dialog.create({
+    dark: true,
+    message: "Are you sure you want to delete this save?",
+    cancel: true,
+    persistent: true,
+  }).onOk(() => {
+    delete metaSave.saves[id];
+    if (metaSave.currentSave == id) {
+      metaSave.currentSave = Math.max(metaSave.currentSave - 1, 0);
+      loadSpecificSave(metaSave.currentSave);
+    }
 
-  delete metaSave.saves[id];
-  if (metaSave.currentSave == id) {
-    metaSave.currentSave = Math.max(metaSave.currentSave - 1, 0);
-    loadSpecificSave(metaSave.currentSave);
-  }
-
-  Notify.create({
-    message: "Save deleted!",
-    position: "top-right",
-    type: "negative",
-    timeout: 2000,
-    badgeStyle: "opacity: 0;",
+    Notify.create({
+      message: "Save deleted!",
+      position: "top-right",
+      type: "negative",
+      timeout: 2000,
+      badgeStyle: "opacity: 0;",
+    });
   });
 }
 

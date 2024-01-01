@@ -42,6 +42,20 @@ const TAB_DATA: TabData[] = [
     },
     condition: computed(() => player.featuresUnl.includes("timeReversal")),
   },
+  {
+    name: "Collapse",
+    class: {
+      collapse: true,
+    },
+    condition: computed(() => player.featuresUnl.includes("collapse")),
+  },
+  {
+    name: "Pathogens",
+    class: {
+      pathogens: true,
+    },
+    condition: computed(() => player.featuresUnl.includes("pathogens")),
+  },
 ];
 
 export function availableTabs(): TabData[] {

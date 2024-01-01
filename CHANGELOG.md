@@ -1,5 +1,25 @@
 # Changelog
 
+## α1.5.1
+
+- Added the last Pathogen Upgrade
+
+## α1.5
+
+- Implemented Pathogens
+- Added a few Collapse Milestones
+
+## α1.4
+
+- Implemented Collapse
+- Added a few new Rank/Tier rewards
+- Various minor fixes/modifications
+
+## α1.3.1
+
+- Balanced Time Reversal (two achievements still aren't doable, this is intentional)
+- Various minor clarifications/wording improvements
+
 ## α1.3
 
 - Implemented Time Reversal (NOT fully balanced yet)

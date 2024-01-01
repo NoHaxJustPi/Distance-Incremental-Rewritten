@@ -6,8 +6,12 @@ import { Notify } from "quasar";
 import Decimal from "break_eternity.js";
 
 import type { Feature } from "@/util/feature";
-import { auto } from "../auto/auto";
+import { Automated, auto } from "../auto/auto";
 import { timeReversal } from "../timeReversal/timeReversal";
+import { collapse } from "../collapse/collapse";
+import { rockets } from "../rockets/rockets";
+import { rocketFuel } from "../rocketFuel/rocketFuel";
+import { pathogens } from "../pathogens/pathogens";
 
 type AchData = Record<
   number,
@@ -26,6 +30,7 @@ export const ACH_NAMES: Record<number, string> = {
   15: "Rocket Blast",
   16: "Overly Complex",
   17: "Into the Endless",
+  18: "Cold-Blooded Killer",
 
   21: "Driving for Hours",
   22: "Oil Change",
@@ -34,6 +39,7 @@ export const ACH_NAMES: Record<number, string> = {
   25: "Refuel",
   26: "Riveting Gameplay",
   27: "Prehistory Awakens",
+  28: "Ritual Sacrifice",
 
   31: "Just Under a Saturn Revolution",
   32: "Putting in the Fake Fuel",
@@ -42,6 +48,7 @@ export const ACH_NAMES: Record<number, string> = {
   35: "Coal isn't Enough!",
   36: "Sisyphean Effort",
   37: "Tesseractophobia?",
+  38: "Soulsucker",
 
   41: "Parallax to the Tenth",
   42: "Musty Progress",
@@ -50,6 +57,25 @@ export const ACH_NAMES: Record<number, string> = {
   45: "No Furnace?",
   46: "Who Needs Mechanics?",
   47: "The Gods' Sprinkle",
+  48: "Power Vacuum",
+
+  51: "A Whole New World",
+  52: "Get Back on My Plane!",
+  53: "No More!",
+  54: "Incomprehensible Flight Patterns",
+  55: "Renewable Energy?",
+  56: "Nuclear Physicist",
+  57: "Temporal Sight",
+  58: "The Source of Existence",
+
+  61: "This Can't Be Good...",
+  62: "No More Lives",
+  63: "Nice.",
+  64: "Hyperspeed",
+  65: "The Next Level",
+  66: "Execute The Order",
+  67: "Nested Universes",
+  68: "Smart Bird",
 };
 
 const ACH_IDS = Object.keys(ACH_NAMES).map(Number);
@@ -87,7 +113,7 @@ export const achs: Feature<AchData, {}> = addFeature("achs", 1, {
 
     15: computed(() => ({
       unl: Decimal.gte(player.rocketFuel, 1),
-      desc: `Get ${formatWhole(1)} Rocket Fuel.`,
+      desc: `Purchase ${formatWhole(1)} Rocket Fuel.`,
       reward: `Decrease the Tier requirement by ${formatWhole(1)} Rank.`,
     })),
 
@@ -101,6 +127,12 @@ export const achs: Feature<AchData, {}> = addFeature("achs", 1, {
       unl: player.featuresUnl.includes("timeReversal"),
       desc: `Unlock Time Reversal.`,
       reward: `Unlock the Rocket Autobuyer.`,
+    })),
+
+    18: computed(() => ({
+      unl: Decimal.gte(player.collapse.cadavers, 1),
+      desc: `Get ${formatWhole(1)} Cadaver.`,
+      reward: `Decrease the Rank requirement base by ${format(0.05)}.`,
     })),
 
     21: computed(() => ({
@@ -129,7 +161,7 @@ export const achs: Feature<AchData, {}> = addFeature("achs", 1, {
 
     25: computed(() => ({
       unl: Decimal.gte(player.rocketFuel, 3),
-      desc: `Reach ${formatWhole(3)} Rocket Fuel.`,
+      desc: `Purchase ${formatWhole(3)} Rocket Fuel.`,
       reward: `Decrease the Tier requirement by ${formatWhole(1)} Rank again.`,
     })),
 
@@ -142,6 +174,11 @@ export const achs: Feature<AchData, {}> = addFeature("achs", 1, {
       unl: Decimal.gte(player.timeReversal.cubes, 5555),
       desc: `Reach ${formatWhole(5555)} Time Cubes.`,
       reward: `Increase Time Speed by ${formatWhole(10)}%.`,
+    })),
+
+    28: computed(() => ({
+      unl: Decimal.gte(collapse.data.essence.value, 666),
+      desc: `Create ${formatWhole(666)} Life Essence.`,
     })),
 
     31: computed(() => ({
@@ -168,7 +205,7 @@ export const achs: Feature<AchData, {}> = addFeature("achs", 1, {
 
     35: computed(() => ({
       unl: Decimal.gte(player.rocketFuel, 5),
-      desc: `Reach ${formatWhole(5)} Rocket Fuel.`,
+      desc: `Purchase ${formatWhole(5)} Rocket Fuel.`,
       reward: `Start at Tier ${formatWhole(1)} on reset.`,
     })),
 
@@ -181,6 +218,17 @@ export const achs: Feature<AchData, {}> = addFeature("achs", 1, {
     37: computed(() => ({
       unl: player.timeReversal.upgrades.length >= 8,
       desc: `Purchase ${formatWhole(8)} Time Reversal Upgrades.`,
+    })),
+
+    38: computed(() => ({
+      unl:
+        Decimal.gte(collapse.data.essence.value, 1000) &&
+        Decimal.eq(player.rockets, 0) &&
+        Decimal.eq(player.rocketFuel, 0),
+      desc: `Create ${formatWhole(
+        1000
+      )} Life Essence without Rockets or Rocket Fuel.`,
+      reward: `Increase Life Essence gain by ${1}.`,
     })),
 
     41: computed(() => ({
@@ -207,19 +255,129 @@ export const achs: Feature<AchData, {}> = addFeature("achs", 1, {
 
     45: computed(() => ({
       unl: Decimal.gte(player.rocketFuel, 12),
-      desc: `Reach ${formatWhole(12)} Rocket Fuel.`,
+      desc: `Purchase ${formatWhole(12)} Rocket Fuel.`,
       reward: `Increase Acceleration by ${formatWhole(11)}%.`,
     })),
 
     46: computed(() => ({
-      unl: Decimal.gte(auto.data[2].power.value, 0.1),
-      desc: `Get Auto-Rocket efficiency to ${formatWhole(10)}%.`,
+      unl: Decimal.gte(auto.data[2].power.value, 0.03),
+      desc: `Get Auto-Rocket efficiency to ${formatWhole(3)}%.`,
     })),
 
     47: computed(() => ({
-      unl: Decimal.gte(timeReversal.data.timeSpeed.value, 1e3),
-      desc: `Reach ${formatWhole(1e3)}x Time Speed.`,
+      unl: Decimal.gte(timeReversal.data.timeSpeed.value, 10),
+      desc: `Reach ${formatWhole(10)}x Time Speed.`,
       reward: `Increase Time Speed by ${formatWhole(11)}%.`,
+    })),
+
+    48: computed(() => ({
+      unl:
+        Decimal.gte(player.distance, Decimal.mul(50, DISTANCES.Mpc)) &&
+        player.timeReversal.upgrades.length === 0,
+      desc: `Reach ${formatDistance(
+        Decimal.mul(50, DISTANCES.Mpc)
+      )} without any Time Reversal Upgrades.`,
+    })),
+
+    51: computed(() => ({
+      unl: Decimal.gte(player.distance, DISTANCES.uni),
+      desc: `Reach ${formatDistance(DISTANCES.uni)}.`,
+      reward: `Increase Acceleration by ${formatWhole(31)}%.`,
+    })),
+
+    52: computed(() => ({
+      unl: Decimal.gte(player.rank, 32),
+      desc: `Reach Rank ${formatWhole(32)}.`,
+      reward: `Decrease the Rank requirement by ${formatWhole(16)}%.`,
+    })),
+
+    53: computed(() => ({
+      unl:
+        Decimal.gte(collapse.data.essence.value, 100) &&
+        Decimal.eq(player.tier, 1),
+      desc: `Create ${formatWhole(
+        100
+      )} Life Essence while at Tier ${formatWhole(1)}.`,
+    })),
+
+    54: computed(() => ({
+      unl: Decimal.gte(rockets.data.effExp.value, 16),
+      desc: `Have a Rocket effect exponent of at least ${formatWhole(16)}.`,
+      reward: `Increase the Rocket effect exponent by ${format(0.05)}.`,
+    })),
+
+    55: computed(() => ({
+      unl: Decimal.gte(rocketFuel.data.extra.value, 4.5),
+      desc: `Reach ${format(4.5)} extra Rocket Fuel.`,
+    })),
+
+    56: computed(() => ({
+      unl: player.auto[Automated.RocketFuel]?.mastered ?? false,
+      desc: `Reach Mastery of Auto-Rocket Fuel.`,
+      reward: `Increase Rocket gain by ${formatWhole(9)}%.`,
+    })),
+
+    57: computed(() => ({
+      unl: Decimal.gte(player.timeReversal.cubes, 1e9),
+      desc: `Reach ${formatWhole(1e9)} Time Cubes.`,
+    })),
+
+    58: computed(() => ({
+      unl: player.collapse.milestones.length >= 12,
+      desc: `Earn ${formatWhole(12)} Collapse Milestones.`,
+      reward: `Increase Time Speed by ${formatWhole(7)}%.`,
+    })),
+
+    61: computed(() => ({
+      unl: Decimal.gte(player.pathogens.upgrades[11] ?? 0, 1),
+      desc: `Purchase a Viral Creation.`,
+    })),
+
+    62: computed(() => ({
+      unl:
+        Decimal.gte(collapse.data.essence.value, 3000) &&
+        Decimal.lte(player.tier, 1) &&
+        Decimal.eq(player.rockets, 0) &&
+        Decimal.eq(player.rocketFuel, 0),
+      desc: `Create ${formatWhole(
+        3000
+      )} Life Essence without Rockets or Rocket Fuel, and at Tier ${formatWhole(
+        1
+      )}.`,
+      reward: `Increase Life Essence gain by ${1}.`,
+    })),
+
+    63: computed(() => ({
+      unl: Decimal.gte(player.rank, 69),
+      desc: `Reach Rank ${formatWhole(69)}.`,
+    })),
+
+    64: computed(() => ({
+      unl: Decimal.gte(timeReversal.data.timeSpeed.value, 1e6),
+      desc: `Reach ${format(1e6)}x Time Speed.`,
+    })),
+
+    65: computed(() => ({
+      unl: Decimal.gte(player.pathogens.upgrades[32] ?? 0, 5),
+      desc: `Purchase ${formatWhole(5)} Viral Evolutions.`,
+      reward: `Increase Pathogen gain by ${formatWhole(4)}%.`,
+    })),
+
+    66: computed(() => ({
+      unl: Decimal.gte(player.collapse.cadavers, 1e15),
+      desc: `Get ${format(1e15)} Cadavers.`,
+    })),
+
+    67: computed(() => ({
+      unl: Decimal.gte(player.distance, Decimal.mul("1e80", DISTANCES.uni)),
+      desc: `Reach ${formatDistance(Decimal.mul("1e80", DISTANCES.uni))}.`,
+      reward: `Increase Acceleration by ${formatWhole(13)}%.`,
+    })),
+
+    68: computed(() => ({
+      unl: Decimal.gte(pathogens.data.totalUpgs.value, 1e3),
+      desc: `Reach ${formatWhole(1e3)} Total Pathogen Upgrades.`,
+      reward: `Increase Time Speed by ${formatWhole(9)}%.`,
     })),
   },
 
